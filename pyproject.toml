@@ -1,0 +1,30 @@
+[project]
+name = "referral-auth-service"
+version = "0.1.0"
+description = "Referral authorization service"
+authors = [
+    {name = "Olga"}
+]
+readme = "README.md"
+requires-python = "^3.13"
+dependencies = [
+    "django (>=6.0.2,<7.0.0)",
+    "djangorestframework (>=3.16.1,<4.0.0)",
+    "psycopg (>=3.3.3,<4.0.0)",
+    "drf-spectacular (>=0.29.0,<0.30.0)",
+    "djangorestframework-simplejwt (>=5.5.1,<6.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
+pytest-django = "^4.12.0"
+coverage = "^7.13.4"
+flake8 = "^7.3.0"
+isort = "^8.0.1"
+
