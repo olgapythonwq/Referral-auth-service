@@ -1,8 +1,12 @@
 """API views for OTP authentication flow. Handles HTTP layer only. Business logic is delegated to services module."""
+from django.contrib.auth import get_user_model
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from .permissions import IsOwner
 from .serializers import RequestCodeSerializer, VerifyCodeSerializer, ProfileSerializer, ActivateInviteSerializer
 from .services import request_otp, verify_otp, activate_invite
 import time
@@ -68,3 +72,14 @@ class ActivateInviteView(APIView):
         activate_invite(request.user, serializer.validated_data["invite_code"],)
 
         return Response({"detail": "Invite activated"}, status=status.HTTP_200_OK,)
+
+
+User = get_user_model()
+
+
+class OwnerProfileView(RetrieveAPIView):
+    """Retrieve user profile by ID with owner-only access."""
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+    lookup_url_kwarg = "user_id"
