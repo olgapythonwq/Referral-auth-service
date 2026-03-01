@@ -51,14 +51,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         validators=[phone_validator],
         verbose_name="Phone number"
     )
-    invite_code = models.CharField(max_length=6, unique=True, blank=True, validators=[alphanumeric_validator])
+    invite_code = models.CharField(max_length=6, unique=True, null=True, blank=True,
+                                   validators=[alphanumeric_validator])
     invited_by = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name="referrals")
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # для админки
     otp_code = models.CharField(max_length=6, blank=True, null=True, validators=[numeric_validator])
-    otp_created_at = models.DateTimeField(null=True, blank=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)  # для проверки TTL
 
     objects = UserManager()
 
