@@ -1,9 +1,10 @@
 """API views for OTP authentication flow. Handles HTTP layer only. Business logic is delegated to services module."""
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RequestCodeSerializer, VerifyCodeSerializer
-from .services import request_otp, verify_otp
+from .serializers import RequestCodeSerializer, VerifyCodeSerializer, ProfileSerializer, ActivateInviteSerializer
+from .services import request_otp, verify_otp, activate_invite
 import time
 
 
@@ -45,3 +46,25 @@ class VerifyCodeView(APIView):
         )
 
         return Response(tokens, status=status.HTTP_200_OK)
+
+
+class ProfileView(APIView):
+    """GET endpoint for retrieving current user's profile."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data)
+
+
+class ActivateInviteView(APIView):
+    """POST endpoint for activating referral invite code."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ActivateInviteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        activate_invite(request.user, serializer.validated_data["invite_code"],)
+
+        return Response({"detail": "Invite activated"}, status=status.HTTP_200_OK,)

@@ -65,3 +65,26 @@ def verify_otp(phone: str, code: str):
         "access": str(refresh.access_token),
         "refresh": str(refresh),
     }
+
+def activate_invite(user: User, invite_code: str):
+    """Activate referral invite code for a user.
+    Rules:
+    - User cannot activate own code
+    - User can activate code only once
+    - Code must exist"""
+
+    if user.invited_by:  # Check if user already activated a referral
+        raise ValidationError("Invite code already activated")
+
+    try:
+        inviter = User.objects.get(invite_code=invite_code)  # Find inviter
+    except User.DoesNotExist:
+        raise ValidationError("Invalid invite code")
+
+    if inviter == user:  # Prevent self-invite
+        raise ValidationError("Cannot use your own invite code")
+
+    user.invited_by = inviter  # Assign inviter
+    user.save()
+
+    return user
