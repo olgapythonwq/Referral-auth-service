@@ -1,5 +1,6 @@
 """Serializers for OTP authentication endpoints. Responsible only for input validation."""
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from .models import User
 
@@ -37,12 +38,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ("phone", "invite_code", "invited_by", "referrals",)
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_invited_by(self, obj):
         """Return phone number of inviter."""
         if obj.invited_by:
             return obj.invited_by.phone
         return None
 
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
     def get_referrals(self, obj):
         """Return list of phone numbers of users invited by current user."""
         return [user.phone for user in obj.referrals.all()]
