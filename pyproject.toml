@@ -30,3 +30,6 @@ flake8 = "^7.3.0"
 isort = "^8.0.1"
 pytest-cov = "^7.0.0"
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.ci"
+python_files = ["test_*.py"]
