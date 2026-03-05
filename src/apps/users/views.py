@@ -1,19 +1,19 @@
 """API views for OTP authentication flow. Handles HTTP layer only. Business logic is delegated to services module."""
-from django.contrib.auth import get_user_model
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
-from .permissions import IsOwner
-from .serializers import RequestCodeSerializer, VerifyCodeSerializer, ProfileSerializer, ActivateInviteSerializer
-from .services import request_otp, verify_otp, activate_invite
 import time
 
-
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from django.contrib.auth import get_user_model
 from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiExample, extend_schema
+from rest_framework import status
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .permissions import IsOwner
+from .serializers import (ActivateInviteSerializer, ProfileSerializer,
+                          RequestCodeSerializer, VerifyCodeSerializer)
+from .services import activate_invite, request_otp, verify_otp
 
 
 @extend_schema(

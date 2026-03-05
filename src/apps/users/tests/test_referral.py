@@ -2,7 +2,6 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
-
 User = get_user_model()
 
 
@@ -56,6 +55,7 @@ def test_activate_invite_twice_returns_400(api_client):
     )
 
     assert response.status_code == 400
+
 
 @pytest.mark.django_db
 def test_self_invite_returns_400(api_client):

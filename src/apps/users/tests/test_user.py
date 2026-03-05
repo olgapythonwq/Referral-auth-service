@@ -2,7 +2,6 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
-
 User = get_user_model()
 
 
@@ -28,6 +27,7 @@ def test_request_code_for_existing_user_does_not_create_duplicate(api_client):
     )
 
     assert User.objects.filter(phone=phone).count() == 1
+
 
 @pytest.mark.django_db
 def test_profile_requires_authentication(api_client):

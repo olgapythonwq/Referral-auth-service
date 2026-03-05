@@ -2,9 +2,10 @@
 import random
 import string
 
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.core.validators import RegexValidator
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
 def generate_invite_code(length: int = 6) -> str:
@@ -54,6 +55,7 @@ numeric_validator = RegexValidator(
     regex=r'^[0-9]+$',
     message="Only numbers are allowed."
 )
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model using phone as USERNAME_FIELD.
