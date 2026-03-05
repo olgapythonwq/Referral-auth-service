@@ -21,6 +21,11 @@ services:
         condition: service_healthy
     ports:
       - "8000:8000"
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:8000
+      "
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
       interval: 30s
