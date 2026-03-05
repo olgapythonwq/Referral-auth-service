@@ -89,9 +89,13 @@ jobs:
       - name: Install dependencies  # Устанавливаем зависимости проекта
         run: poetry install --no-interaction --no-root
 
-      - run: python manage.py migrate
+      - name: Run migrations
+        working-directory: src
+        run: python manage.py migrate
 
-      - run: pytest -v --maxfail=1 --disable-warnings
+      - name: Run tests
+        working-directory: src
+        run: pytest -v --maxfail=1 --disable-warnings
 
   docker:
     runs-on: ubuntu-latest
