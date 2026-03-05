@@ -134,5 +134,5 @@ jobs:
             git fetch origin
             git checkout develop
             git pull origin develop
-            docker compose down
-            docker compose up -d --build
+            docker compose --env-file .env.prod -f docker-compose.prod.yml down
+            docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
