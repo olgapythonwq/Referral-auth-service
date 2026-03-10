@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import RequestCodeView, VerifyCodeView, ProfileView, ActivateInviteView, OwnerProfileView
+from .views import (ActivateInviteView, OwnerProfileView, ProfileView,
+                    RequestCodeView, VerifyCodeView)
 
 app_name = "users"
 

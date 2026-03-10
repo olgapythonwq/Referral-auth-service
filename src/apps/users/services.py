@@ -3,12 +3,12 @@ Business logic for OTP authentication.
 This module contains pure service-layer logic. No HTTP, no serializers, no request objects.
 """
 import random
-from django.utils import timezone
-from django.conf import settings
-from rest_framework.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -65,6 +65,7 @@ def verify_otp(phone: str, code: str):
         "access": str(refresh.access_token),
         "refresh": str(refresh),
     }
+
 
 def activate_invite(user: User, invite_code: str):
     """Activate referral invite code for a user.

@@ -1,9 +1,9 @@
+from datetime import timedelta
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import timedelta
 from rest_framework.test import APIClient
-
 
 User = get_user_model()
 
@@ -14,7 +14,6 @@ def api_client():
 
 
 @pytest.mark.django_db  # Разрешает тесту доступ к БД. Поднимает транзакцию и откатывает изменения.
-
 def test_request_code_creates_user(api_client):
     response = api_client.post(
         "/users/auth/request-code/",
@@ -24,6 +23,7 @@ def test_request_code_creates_user(api_client):
 
     assert response.status_code == 200
     assert User.objects.filter(phone="+79991234567").exists()
+
 
 @pytest.mark.django_db
 def test_verify_code_returns_tokens(api_client):
@@ -47,6 +47,7 @@ def test_verify_code_returns_tokens(api_client):
     assert "access" in response.json()
     assert "refresh" in response.json()
 
+
 @pytest.mark.django_db
 def test_verify_with_wrong_code_returns_400(api_client):
     phone = "+79990000001"
@@ -64,6 +65,7 @@ def test_verify_with_wrong_code_returns_400(api_client):
     )
 
     assert response.status_code == 400
+
 
 @pytest.mark.django_db
 def test_verify_with_expired_code_returns_400(api_client):
@@ -88,6 +90,7 @@ def test_verify_with_expired_code_returns_400(api_client):
     )
 
     assert response.status_code == 400
+
 
 @pytest.mark.django_db
 def test_request_code_twice_generates_new_code(api_client):

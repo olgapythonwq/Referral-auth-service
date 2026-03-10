@@ -1,3 +1,5 @@
+import os
+
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -6,7 +8,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS =  os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 DATABASES = {
     "default": {
@@ -24,4 +26,3 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
