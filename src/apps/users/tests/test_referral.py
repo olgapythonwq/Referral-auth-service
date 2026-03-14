@@ -1,13 +1,8 @@
 import pytest
 from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
+from rest_framework import status
 
 User = get_user_model()
-
-
-@pytest.fixture
-def api_client():
-    return APIClient()
 
 
 @pytest.mark.django_db
@@ -20,13 +15,9 @@ def test_activate_invite_success(api_client):
 
     api_client.force_authenticate(user=user)
 
-    response = api_client.post(
-        "/users/profile/activate-invite/",
-        {"invite_code": "ABC123"},
-        content_type="application/json",
-    )
+    response = api_client.post("/users/api/profile/activate-invite/", {"invite_code": "ABC123"}, format="json",)
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
 
     user.refresh_from_db()
     assert user.invited_by == inviter
@@ -42,19 +33,11 @@ def test_activate_invite_twice_returns_400(api_client):
 
     api_client.force_authenticate(user=user)
 
-    api_client.post(
-        "/users/profile/activate-invite/",
-        {"invite_code": "XYZ123"},
-        content_type="application/json",
-    )
+    api_client.post("/users/api/profile/activate-invite/", {"invite_code": "XYZ123"}, format="json",)
 
-    response = api_client.post(
-        "/users/profile/activate-invite/",
-        {"invite_code": "XYZ123"},
-        content_type="application/json",
-    )
+    response = api_client.post("/users/api/profile/activate-invite/", {"invite_code": "XYZ123"}, format="json",)
 
-    assert response.status_code == 400
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
@@ -65,10 +48,6 @@ def test_self_invite_returns_400(api_client):
 
     api_client.force_authenticate(user=user)
 
-    response = api_client.post(
-        "/users/profile/activate-invite/",
-        {"invite_code": "SELF01"},
-        content_type="application/json",
-    )
+    response = api_client.post("/users/api/profile/activate-invite/", {"invite_code": "SELF01"}, format="json",)
 
-    assert response.status_code == 400
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

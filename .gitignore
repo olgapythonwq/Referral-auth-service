@@ -172,6 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-/.env.prod
 .env.*
+!.env.sample
+!.env.prod.sample
 *.pyc
