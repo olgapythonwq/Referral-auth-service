@@ -2,6 +2,7 @@
 import time
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import render
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
@@ -89,6 +90,10 @@ class VerifyCodeView(APIView):
             1. Validate input.
             2. Verify OTP via service layer.
             3. Return JWT tokens if successful."""
+
+    def get(self, request):
+        phone = request.GET.get("phone")
+        return render(request, "users/verify.html", {"phone": phone})
 
     def post(self, request):
         serializer = VerifyCodeSerializer(data=request.data)

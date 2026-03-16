@@ -1,7 +1,6 @@
-"""
-Business logic for OTP authentication.
-This module contains pure service-layer logic. No HTTP, no serializers, no request objects.
-"""
+"""Business logic for OTP authentication.
+This module contains pure service-layer logic. No HTTP, no serializers, no request objects."""
+import logging
 import random
 
 from django.conf import settings
@@ -9,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -28,8 +29,11 @@ def request_otp(phone: str):
 
     user.otp_code = generate_otp()  # Generate new OTP
     user.otp_created_at = timezone.now()  # Save generation timestamp
-    user.save()
 
+    logger.info(f"OTP generated for {phone}")
+    logger.debug(f"OTP code: {user.otp_code}")
+
+    user.save()
     return user
 
 
@@ -38,20 +42,24 @@ def verify_otp(phone: str, code: str):
         :param phone: phone number
         :param code: 4-digit OTP
         :return: dict with access and refresh tokens"""
-
     try:
         user = User.objects.get(phone=phone)
     except User.DoesNotExist:
+        logger.warning(f"OTP verification failed: user {phone} not found")
         raise ValidationError("Invalid phone or code")
 
     if user.otp_code != code:  # Check code equality
+        logger.warning(f"Invalid OTP attempt for {phone}")
         raise ValidationError("Invalid code")
 
     if not user.otp_created_at:  # None treatment
         raise ValidationError("OTP not requested")
 
     if timezone.now() - user.otp_created_at > settings.OTP_TTL:  # Check expiration (TTL = 5 min)
+        logger.warning(f"Expired OTP for {phone}")
         raise ValidationError("Code expired")
+
+    logger.info(f"User {phone} successfully verified OTP")
 
     # Clear OTP after successful verification
     user.otp_code = ""
@@ -86,6 +94,7 @@ def activate_invite(user: User, invite_code: str):
         raise ValidationError("Cannot use your own invite code")
 
     user.invited_by = inviter  # Assign inviter
+    logger.info(f"User {user.phone} activated invite from {inviter.phone}")
     user.save()
 
     return user
