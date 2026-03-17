@@ -1,23 +1,44 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Verify</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </head>
-<body>
-<form method="post">
+<body class="container mt-5">
+
+<h2 class="mb-4">Verify code for {{ phone }}</h2>
+<hr>
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<!-- Form to check the code -->
+<form method="post" class="mb-3">
   {% csrf_token %}
+    <div class="mb-3">
+    <input type="text" class="form-control" value="{{ phone }}" readonly>
+    </div>
 
-  <input type="text" value="{{ phone }}" readonly>
-  <input type="hidden" name="phone" value="{{ phone }}">
+    <div class="mb-3">
+    <input type="text" name="code" class="form-control" placeholder="Enter code">
+    </div>
 
-  {% if error %}
-    <p style="color:red;">{{ error }}</p>
-  {% endif %}
-
-  <input type="text" name="code">
-  <button type="submit">Verify</button>
+    <button type="submit" class="btn btn-primary">Verify</button>
 
 </form>
+<hr>
+<!-- Button to resend the code -->
+{% if show_resend %}
+<p>Didn't receive the code?</p>
+<form method="post" action="{% url 'users:resend' %}">
+  {% csrf_token %}
+    <button type="submit" class="btn btn-secondary">Resend code</button>
+</form>
+{% endif %}
+
 </body>
 </html>
