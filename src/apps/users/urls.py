@@ -2,7 +2,8 @@ from django.urls import path
 
 from .api_views import (ActivateInviteView, OwnerProfileView, ProfileView,
                         RequestCodeView, VerifyCodeView)
-from .web_views import login_view, profile_view, verify_view
+from .web_views import (login_view, logout_view, profile_view, resend_otp_view,
+                        verify_view)
 
 app_name = "users"
 
@@ -16,5 +17,7 @@ urlpatterns = [
     # WEB
     path("", login_view, name="login"),
     path("verify/", verify_view, name="verify"),
+    path("resend/", resend_otp_view, name="resend"),
     path("profile/", profile_view, name="profile"),
+    path("logout/", logout_view, name="logout"),
 ]

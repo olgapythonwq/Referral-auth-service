@@ -9,28 +9,28 @@ The project demonstrates a modern backend architecture including:
 * JWT authentication
 * OTP login flow
 * Referral system
-* PostgreSQL
-* Docker
+* PostgreSQL database
+* Dockerized deployment
 * CI pipeline (GitHub Actions)
-* Automated tests (pytest)
+* Automated testing with pytest
 
 ---
 
 # Features
 
-### Authentication
+## Authentication
 
 * Phone number based authentication
 * One-time password (OTP) verification
-* JWT token issuing
+* JWT token issuing (access + refresh)
 
-### Referral system
+## Referral System
 
 * Unique invite code for every user
 * Invite activation
 * Referral tracking
 
-### Production infrastructure
+## Production Infrastructure
 
 * PostgreSQL database
 * Docker containers
@@ -55,21 +55,40 @@ The project demonstrates a modern backend architecture including:
 
 ---
 
+# Architecture
+
+The project follows a layered architecture:
+
+views → serializers → services → models
+
+* **Views** handle HTTP requests
+* **Serializers** validate API data
+* **Services** contain business logic
+* **Models** represent database entities
+
+This separation improves maintainability and testability.
+
+---
+
 # Project Structure
 
 ```
 src/
  ├── apps/
- │   ├── users
+ │   ├── users/
  │   │   ├── models.py
  │   │   ├── views.py
+ │   │   ├── views_web.py
  │   │   ├── serializers.py
  │   │   ├── services.py
- │   │   └── tests
- │   └── core
+ │   │   ├── urls.py
+ │   │   └── tests/
+ │   │
+ │   └── core/
+ │       └── views.py
  │
- ├── config
- │   ├── settings
+ ├── config/
+ │   ├── settings/
  │   │   ├── base.py
  │   │   ├── dev.py
  │   │   ├── prod.py
@@ -83,14 +102,13 @@ src/
 
 # Authentication Flow
 
-### Step 1 — Request OTP
+## Step 1 — Request OTP
 
 ```
-POST /auth/request-code/
+POST /users/auth/request-code/
 ```
 
 User sends phone number.
-
 If the user does not exist — the account is created.
 
 ### Request
@@ -117,10 +135,10 @@ OTP is generated and stored with TTL.
 
 ---
 
-# Verify OTP
+## Step 2 — Verify OTP
 
 ```
-POST /auth/verify-code/
+POST /users/auth/verify-code/
 ```
 
 ### Request
@@ -128,7 +146,7 @@ POST /auth/verify-code/
 ```json
 {
   "phone": "+79991234567",
-  "code": "1234"
+  "code": "123456"
 }
 ```
 
@@ -145,13 +163,13 @@ POST /auth/verify-code/
 }
 ```
 
-User becomes **active** and receives JWT tokens.
+User becomes **authenticated** and receives JWT tokens.
 
 ---
 
 # Profile API
 
-Requires JWT authentication.
+All profile endpoints require authentication.
 
 ```
 Authorization: Bearer <access_token>
@@ -159,10 +177,10 @@ Authorization: Bearer <access_token>
 
 ---
 
-# Get Profile
+## Get Profile
 
 ```
-GET /profile/
+GET /users/profile/
 ```
 
 ### Response
@@ -181,10 +199,10 @@ GET /profile/
 
 ---
 
-# Activate Invite Code
+## Activate Invite Code
 
 ```
-POST /profile/activate-invite/
+POST /users/profile/activate-invite/
 ```
 
 ### Request
@@ -247,18 +265,40 @@ Invalid code:
 
 ---
 
-# OpenAPI Documentation
+# Health Check
+
+```
+GET /health/
+```
+
+### Response
+
+```json
+{
+  "status": "ok"
+}
+```
+
+Used for:
+
+* Docker healthchecks
+* load balancers
+* monitoring systems
+
+---
+
+# API Documentation
 
 Swagger UI:
 
 ```
-/api/schema/swagger-ui/
+/api/docs/
 ```
 
 ReDoc:
 
 ```
-/api/schema/redoc/
+/api/redoc/
 ```
 
 ---
@@ -283,6 +323,7 @@ Example:
 ```
 SECRET_KEY=secret
 DEBUG=False
+
 POSTGRES_DB=referral
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
@@ -296,7 +337,7 @@ Run containers:
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-API will be available at:
+Application will be available at:
 
 ```
 http://localhost:8000
@@ -310,19 +351,19 @@ http://localhost:8000
 pytest
 ```
 
-Test coverage target:
+Current test coverage:
 
 ```
-75–85%
+86%
 ```
 
 Test categories:
 
 * OTP flow
-* User creation
-* Invite activation
-* Referral listing
-* Error cases
+* user creation
+* invite activation
+* referral logic
+* error cases
 
 ---
 
@@ -331,27 +372,50 @@ Test categories:
 GitHub Actions pipeline includes:
 
 * dependency installation
+* isort formatting check
 * flake8 lint
-* migrations
-* pytest
+* pytest execution
 * Docker build
-* deployment
 
 Pipeline stages:
 
 ```
-lint → test → docker → deploy
+format → lint → test → docker
+```
+
+---
+
+# Environment Variables
+
+Required environment variables:
+
+```
+SECRET_KEY
+DEBUG
+
+POSTGRES_DB
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_HOST
+POSTGRES_PORT
+```
+
+Example configuration is provided in:
+
+```
+.env.sample
+.env.prod.sample
 ```
 
 ---
 
 # Security Notes
 
-* OTP codes have TTL
+* OTP codes have expiration (TTL)
 * JWT authentication
 * Invite code cannot be reused
 * Self-invite protection
-* Environment variables for secrets
+* Secrets stored in environment variables
 
 ---
 
@@ -360,4 +424,3 @@ lint → test → docker → deploy
 Backend project demonstrating production-ready Django REST API development.
 
 Built as part of backend engineering portfolio.
-

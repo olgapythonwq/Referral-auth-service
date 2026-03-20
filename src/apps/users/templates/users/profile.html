@@ -1,13 +1,67 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </head>
-<body>
-<h1>Profile</h1>
+<body class="container mt-5">
+<h2 class="mb-4">User Profile</h2>
+<hr>
+<p><strong>Phone:</strong> {{ user.phone }}</p>
 
-<p>Phone: {{ user.phone }}</p>
-<p>Invite code: {{ user.invite_code }}</p>
+<p><strong>Your invite code:</strong> {{ user.invite_code }}</p>
+
+<p><strong>Invited by:</strong>
+{% if user.invited_by %}
+    {{ user.invited_by.phone }}
+{% else %}
+    None
+{% endif %}
+</p>
+
+<h3>Your referrals</h3>
+
+<ul>
+{% for ref in user.referrals.all %}
+    <li>{{ ref.phone }}</li>
+{% empty %}
+    <li>No referrals yet</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h3>Activate invite code</h3>
+
+{% if success %}
+<p style="color:green">{{ success }}</p>
+{% endif %}
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% endif %}
+
+{% if not user.invited_by %}
+<form method="post" class="mb-3">
+    {% csrf_token %}
+    <div class="mb-3">
+    <input type="text" name="invite_code" placeholder="Enter invite code">
+    </div>
+    <button type="submit" class="btn btn-primary">Activate</button>
+</form>
+{% else %}
+    Invite already activated
+{% endif %}
+
+<hr>
+
+<form method="post" class="mb-3" action="{% url 'users:logout' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-secondary">Logout</button>
+</form>
 </body>
 </html>
